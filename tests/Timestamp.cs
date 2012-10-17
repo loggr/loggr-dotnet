@@ -16,6 +16,22 @@ namespace tests
         {
             var e = Events.Create().Timestamp(DateTime.Today).Event;
             Assert.IsTrue(e.Timestamp.HasValue);
+            Assert.AreEqual(DateTime.Today.ToUniversalTime(), e.Timestamp);
+        }
+
+        [TestMethod]
+        public void Timestamp_UTC_Base()
+        {
+            var e = Events.Create().Timestamp(DateTime.Today, true).Event;
+            Assert.IsTrue(e.Timestamp.HasValue);
+            Assert.AreEqual(DateTime.Today.ToUniversalTime(), e.Timestamp);
+        }
+
+        [TestMethod]
+        public void Timestamp_NonUTC_Base()
+        {
+            var e = Events.Create().Timestamp(DateTime.Today, false).Event;
+            Assert.IsTrue(e.Timestamp.HasValue);
             Assert.AreEqual(DateTime.Today, e.Timestamp);
         }
 

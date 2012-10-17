@@ -18,6 +18,7 @@ namespace Loggr.Utility
         protected static string _tags = "";
         protected static string _source = "";
         protected static string _user = "";
+        protected static bool? _secure;
 
         public static string ApiKey
         {
@@ -197,5 +198,34 @@ namespace Loggr.Utility
             }
         }
 
+        public static bool Secure
+        {
+            get
+            {
+                if (!_secure.HasValue)
+                {
+                    _secure = false;
+
+                    NameValueCollection config = new NameValueCollection();
+                    config = (NameValueCollection)System.Configuration.ConfigurationManager.GetSection("loggr/log");
+                    if ((config != null))
+                    {
+                        int i = 0;
+                        for (i = 0; i <= config.Keys.Count - 1; i++)
+                        {
+                            if (config.Keys[i] == "secure")
+                            {
+                                string secure = config[i].ToString();
+                                if (!string.IsNullOrEmpty(secure))
+                                {
+                                    _secure = (secure.ToLower() == "true");
+                                }
+                            }
+                        }
+                    }
+                }
+                return _secure.Value;
+            }
+        }
     }
 }

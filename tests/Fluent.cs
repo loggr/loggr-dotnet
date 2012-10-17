@@ -45,16 +45,47 @@ namespace tests
         }
 
         [TestMethod]
+        [ExpectedException(typeof(ApplicationException))]
+        public void Fluent_PostNoText()
+        {
+            TestLogClient client = new TestLogClient();
+            var e = Events.Create().UseLogClient(client).Post();
+        }
+
+        [TestMethod]
         public void Fluent_Post()
         {
-            var e = Events.Create().Post();
+            TestLogClient client = new TestLogClient();
+            var e = Events.Create().UseLogClient(client).Text("foo").Post();
+            client.AssertPostWasValid();
+            Assert.IsTrue(client.HttpClient.Data["text"] == e.Event.Text);
+            Assert.IsNotNull(e);
+        }
+
+        [TestMethod]
+        public void Fluent_PostDefaultAsync()
+        {
+            TestLogClient client = new TestLogClient();
+            var e = Events.Create().UseLogClient(client).Text("foo").Post();
+            Assert.IsTrue(client.WasAsync == true);
             Assert.IsNotNull(e);
         }
 
         [TestMethod]
         public void Fluent_PostAsync()
         {
-            var e = Events.Create().Post(true);
+            TestLogClient client = new TestLogClient();
+            var e = Events.Create().UseLogClient(client).Text("foo").Post(true);
+            Assert.IsTrue(client.WasAsync == true);
+            Assert.IsNotNull(e);
+        }
+
+        [TestMethod]
+        public void Fluent_PostSync()
+        {
+            TestLogClient client = new TestLogClient();
+            var e = Events.Create().UseLogClient(client).Text("foo").Post(false);
+            Assert.IsTrue(client.WasAsync == false);
             Assert.IsNotNull(e);
         }
 
@@ -215,8 +246,8 @@ namespace tests
         [TestMethod]
         public void Fluent_Several()
         {
-            var e = Events.Create()
-                    .UseLog("testlog", "o9cywnr8qyco87qycro87qyc8o7")
+            TestLogClient client = new TestLogClient();
+            var ev = Events.Create().UseLogClient(client)
                     .Text("test")
                     .AddText("test")
                     .Link("test")
@@ -230,7 +261,15 @@ namespace tests
                     .Geo("-123.456", "-123.456")
                     .Post()
                     .Event;
-            Assert.IsNotNull(e);
+            client.AssertPostWasValid();
+            Assert.IsTrue(client.HttpClient.Data["text"] == ev.Text);
+            Assert.IsTrue(client.HttpClient.Data["link"] == ev.Link);
+            Assert.IsTrue(client.HttpClient.Data["source"] == ev.Source);
+            Assert.IsTrue(client.HttpClient.Data["tags"] == string.Join(" ", ev.Tags.ToArray()));
+            Assert.IsTrue(client.HttpClient.Data["value"] == ev.Value.ToString());
+            Assert.IsTrue(client.HttpClient.Data["data"] == ev.Data);
+            Assert.IsTrue(client.HttpClient.Data["geo"] == ev.Geo);
+            Assert.IsNotNull(ev);
         }
     }
 }

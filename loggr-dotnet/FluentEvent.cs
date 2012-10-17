@@ -410,12 +410,37 @@ namespace Loggr
         /// </summary>
         /// <param name="LogKey">Key used to identify a log on Loggr</param>
         /// <param name="ApiKey">Key used to provide access to API on Loggr</param>
+        /// <param name="Secure">Use SSL for posting to Loggr</param>
+        /// <returns></returns>
+        public T UseLog(string LogKey, string ApiKey, bool Secure)
+        {
+            _client = new LogClient(LogKey, ApiKey, Secure);
+            return this as T;
+        }
+
+        /// <summary>
+        /// Specifies posting keys the event should be posted with (by-passes the application's configuration file) 
+        /// </summary>
+        /// <param name="LogKey">Key used to identify a log on Loggr</param>
+        /// <param name="ApiKey">Key used to provide access to API on Loggr</param>
         /// <param name="Server">Hostname of server for posting to Loggr (typically post.loggr.net)</param>
         /// <param name="Version">Version of API for posting to Loggr (typically 1)</param>
+        /// <param name="Secure">Use SSL for posting to Loggr</param>
         /// <returns></returns>
-        public T UseLog(string LogKey, string ApiKey, string Server, string Version)
+        public T UseLog(string LogKey, string ApiKey, string Server, string Version, bool Secure)
         {
-            _client = new LogClient(LogKey, ApiKey, Server, Version);
+            _client = new LogClient(LogKey, ApiKey, Server, Version, Secure);
+            return this as T;
+        }
+
+        /// <summary>
+        /// Specifies the log client the event should be posted with (mainly used for testing)
+        /// </summary>
+        /// <param name="client">The LogClient to use</param>
+        /// <returns></returns>
+        public T UseLogClient(LogClient client)
+        {
+            _client = client;
             return this as T;
         }
 

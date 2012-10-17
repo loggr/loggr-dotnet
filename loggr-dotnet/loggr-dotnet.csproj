@@ -39,7 +39,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="HttpClient.cs" />
     <Compile Include="IFluentEvent.cs" />
+    <Compile Include="IHttpClient.cs" />
     <Compile Include="Users.cs" />
     <Compile Include="Utility\Configuration.cs" />
     <Compile Include="Event.cs" />

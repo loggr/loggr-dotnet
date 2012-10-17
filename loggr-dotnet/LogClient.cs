@@ -18,11 +18,17 @@ namespace Loggr
         /// Initializes a new instance of Loggr.LogClient class by using configuration file settings
         /// </summary>
         public LogClient()
+            : this(Utility.Configuration.LogKey, Utility.Configuration.ApiKey, Utility.Configuration.Server, Utility.Configuration.Version, Utility.Configuration.Secure)
         {
-            _logKey = Utility.Configuration.LogKey;
-            _apiKey = Utility.Configuration.ApiKey;
-            _server = Utility.Configuration.Server;
-            _version = Utility.Configuration.Version;
+        }
+
+        /// <summary>
+        /// Initializes a new instance of Loggr.LogClient class by using configuration file settings, but specifying SSL
+        /// </summary>
+        /// <param name="Secure">Use SSL for posting to Loggr</param>
+        public LogClient(bool Secure)
+            : this(Utility.Configuration.LogKey, Utility.Configuration.ApiKey, Utility.Configuration.Server, Utility.Configuration.Version, Secure)
+        {
         }
 
         /// <summary>
@@ -30,25 +36,37 @@ namespace Loggr
         /// </summary>
         /// <param name="LogKey">Key used to identify a log on Loggr</param>
         /// <param name="ApiKey">Key used to provide access to API on Loggr</param>
-        public LogClient(string LogKey, string ApiKey) : this()
+        public LogClient(string LogKey, string ApiKey)
+            : this(LogKey, ApiKey, Utility.Configuration.Server, Utility.Configuration.Version, Utility.Configuration.Secure)
         {
-            _logKey = LogKey;
-            _apiKey = ApiKey;
         }
 
         /// <summary>
-        /// Initializes a new instance of Loggr.LogClient class by using the specified LogKey, ApiKey, Server and Version
+        /// Initializes a new instance of Loggr.LogClient class by using the specified LogKey, ApiKey and SSL mode
+        /// </summary>
+        /// <param name="LogKey">Key used to identify a log on Loggr</param>
+        /// <param name="ApiKey">Key used to provide access to API on Loggr</param>
+        /// <param name="Secure">Use SSL for posting to Loggr</param>
+        public LogClient(string LogKey, string ApiKey, bool Secure)
+            : this(LogKey, ApiKey, Utility.Configuration.Server, Utility.Configuration.Version, Secure)
+        {
+        }
+
+        /// <summary>
+        /// Initializes a new instance of Loggr.LogClient class by using the specified LogKey, ApiKey, Server, Version and SSL mode
         /// </summary>
         /// <param name="LogKey">Key used to identify a log on Loggr</param>
         /// <param name="ApiKey">Key used to provide access to API on Loggr</param>
         /// <param name="Server">Hostname of server for posting to Loggr (typically post.loggr.net)</param>
         /// <param name="Version">Version of API for posting to Loggr (typically 1)</param>
-        public LogClient(string LogKey, string ApiKey, string Server, string Version) : this()
+        /// <param name="Secure">Use SSL for posting to Loggr</param>
+        public LogClient(string LogKey, string ApiKey, string Server, string Version, bool Secure)
         {
             _logKey = LogKey;
             _apiKey = ApiKey;
             _server = Server;
             _version = Version;
+            _secure = Secure;
         }
 
         #endregion
@@ -59,6 +77,7 @@ namespace Loggr
         protected string _logKey = "";
         protected string _version = "";
         protected string _server = "";
+        protected bool _secure = false;
 
         public string ApiKey
         {
@@ -108,22 +127,21 @@ namespace Loggr
             }
         }
 
+        public bool Secure
+        {
+            get
+            {
+                return _secure;
+            }
+            set
+            {
+                _secure = value;
+            }
+        }
+
         #endregion
 
         #region Post
-
-        internal class LogWebClient : WebClient
-        {
-            protected override System.Net.WebRequest GetWebRequest(System.Uri address)
-            {
-                WebRequest req = base.GetWebRequest(address);
-                if (req is HttpWebRequest)
-                {
-                    ((HttpWebRequest)req).KeepAlive = false;
-                }
-                return req;
-            }
-        }
 
         private delegate void PostEventDelegate(Event eventObj);
 
@@ -141,8 +159,12 @@ namespace Loggr
         /// </summary>
         /// <param name="eventObj">A Loggr.Event that contains the event to send</param>
         /// <param name="async">A bool that specifies how the event should be posted. Typically an application will post asynchronously for best performance, but sometimes an event needs to be posted synchronously if the application needs to block until the event has completed posting</param>
-        public void Post(Event eventObj, bool async)
+        public virtual void Post(Event eventObj, bool async)
         {
+            // make sure our event has at least a text field
+            if (string.IsNullOrEmpty(eventObj.Text))
+                throw new ApplicationException("Event cannot have an empty Text field");
+
             // modify event based on configuration
             MergeConfigurationWithEvent(eventObj);
 
@@ -160,13 +182,11 @@ namespace Loggr
         {
             if (!string.IsNullOrEmpty(this.ApiKey) && !string.IsNullOrEmpty(this.LogKey))
             {
-                string url = string.Format("http://{0}/{1}/logs/{2}/events", this.Server, this.Version, this.LogKey);
+                string url = string.Format("{3}://{0}/{1}/logs/{2}/events", this.Server, this.Version, this.LogKey, this.Secure ? "https" : "http");
                 string postStr = string.Format("{0}&apikey={1}", CreateEventQuerystring(eventObj), this.ApiKey);
-                LogWebClient cli = new LogWebClient();
-                cli.Headers.Add("Content-Type", "application/x-www-form-urlencoded");
                 try
                 {
-                    cli.UploadData(new Uri(url), "POST", System.Text.Encoding.ASCII.GetBytes(postStr));
+                    HttpClient.PostData(url, postStr);
                 }
                 catch (Exception)
                 {
@@ -234,13 +254,11 @@ namespace Loggr
         {
             if (!string.IsNullOrEmpty(this.ApiKey) && !string.IsNullOrEmpty(this.LogKey))
             {
-                string url = string.Format("http://{0}/{1}/logs/{2}/users", this.Server, this.Version, this.LogKey);
+                string url = string.Format("{3}://{0}/{1}/logs/{2}/users", this.Server, this.Version, this.LogKey, this.Secure ? "https" : "http");
                 string postStr = string.Format("{0}&apikey={1}", CreateUserQuerystring(username, email, page), this.ApiKey);
-                LogWebClient cli = new LogWebClient();
-                cli.Headers.Add("Content-Type", "application/x-www-form-urlencoded");
                 try
                 {
-                    cli.UploadData(new Uri(url), "POST", System.Text.Encoding.ASCII.GetBytes(postStr));
+                    HttpClient.PostData(url, postStr);
                 }
                 catch (Exception)
                 {
@@ -372,6 +390,31 @@ namespace Loggr
                 return input;
             else
                 return input.Substring(0, length);
+        }
+
+        #endregion
+
+        #region Test Helpers
+
+        private IHttpClient _httpClient;
+
+        private IHttpClient HttpClient
+        {
+            get
+            {
+                if (_httpClient == null)
+                    _httpClient = new HttpClient();
+                return _httpClient;
+            }
+            set
+            {
+                _httpClient = value;
+            }
+        }
+
+        public void SetHttpClient(IHttpClient client)
+        {
+            HttpClient = client;
         }
 
         #endregion
