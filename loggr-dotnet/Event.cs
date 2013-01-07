@@ -36,8 +36,6 @@ namespace Loggr
         {
             get
             {
-                System.Net.Mail.MailMessage mm = new System.Net.Mail.MailMessage();
-
                 return _text;
             }
             set
