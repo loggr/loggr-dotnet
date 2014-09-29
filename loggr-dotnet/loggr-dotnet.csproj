@@ -51,6 +51,7 @@
     <Compile Include="LogClient.cs" />
     <Compile Include="Utility\ObjectDumper.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Utility\Settings.cs" />
     <Compile Include="Utility\Tags.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
