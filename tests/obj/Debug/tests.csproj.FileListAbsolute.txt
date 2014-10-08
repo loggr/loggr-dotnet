@@ -1,0 +1,7 @@
+D:\Working\github\davideweaver\loggr-dotnet\tests\bin\Debug\tests.dll
+D:\Working\github\davideweaver\loggr-dotnet\tests\bin\Debug\tests.pdb
+D:\Working\github\davideweaver\loggr-dotnet\tests\bin\Debug\loggr-dotnet.dll
+D:\Working\github\davideweaver\loggr-dotnet\tests\bin\Debug\loggr-dotnet.pdb
+D:\Working\github\davideweaver\loggr-dotnet\tests\obj\Debug\tests.csprojResolveAssemblyReference.cache
+D:\Working\github\davideweaver\loggr-dotnet\tests\obj\Debug\tests.dll
+D:\Working\github\davideweaver\loggr-dotnet\tests\obj\Debug\tests.pdb
