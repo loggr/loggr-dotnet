@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Text;
 
 namespace Loggr
@@ -354,7 +355,7 @@ namespace Loggr
         /// <returns></returns>
         public virtual T Geo(double Lat, double Lon)
         {
-            this.Event.Geo = String.Format("{0},{1}", Lat.ToString(), Lon.ToString());
+            this.Event.Geo = String.Format(CultureInfo.InvariantCulture, "{0},{1}", Lat, Lon);
             return this as T;
         }
 
@@ -367,8 +368,8 @@ namespace Loggr
         public virtual T Geo(string Lat, string Lon)
         {
             double lat = 0, lon = 0;
-            double.TryParse(Lat, out lat);
-            double.TryParse(Lon, out lon);
+            double.TryParse(Lat, NumberStyles.Any, CultureInfo.InvariantCulture, out lat);
+            double.TryParse(Lon, NumberStyles.Any, CultureInfo.InvariantCulture, out lon);
             return this.Geo(lat, lon);
         }
 
