@@ -73,8 +73,11 @@ namespace Loggr.Utility
             if (HttpContext.Current != null)
             {
                 res += string.Format("<b>Request URL</b>: {0}<br />", HttpContext.Current.Request.Url.ToString());
-                res += string.Format("<b>Is Authenticated</b>: {0}<br />", (HttpContext.Current.User.Identity.IsAuthenticated ? "True" : "False"));
-                res += string.Format("<b>User</b>: {0}<br />", (HttpContext.Current.User.Identity.IsAuthenticated ? HttpContext.Current.User.Identity.Name : "anonymous"));
+                if (HttpContext.Current.User != null)
+                {
+                    res += string.Format("<b>Is Authenticated</b>: {0}<br />", (HttpContext.Current.User.Identity.IsAuthenticated ? "True" : "False"));
+                    res += string.Format("<b>User</b>: {0}<br />", (HttpContext.Current.User.Identity.IsAuthenticated ? HttpContext.Current.User.Identity.Name : "anonymous"));
+                }
                 res += string.Format("<b>User host address</b>: {0}<br />", HttpContext.Current.Request.ServerVariables["REMOTE_ADDR"]);
                 res += string.Format("<b>Request Method</b>: {0}<br />", HttpContext.Current.Request.ServerVariables["REQUEST_METHOD"]);
                 res += string.Format("<b>User Agent</b>: {0}<br />", HttpContext.Current.Request.ServerVariables["HTTP_USER_AGENT"]);
