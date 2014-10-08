@@ -118,7 +118,7 @@ namespace Loggr.Utility
             Buffer += string.Format("[{0}: {1}]<br />", Ex.GetType().ToString(), Ex.Message);
             if (Ex.StackTrace != null)
             {
-                Buffer += Ex.StackTrace.Replace(Environment.NewLine, "<br />");
+                Buffer += HttpUtility.HtmlEncode(Ex.StackTrace).Replace(Environment.NewLine, "<br />");
             }
             else
             {
