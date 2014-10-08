@@ -1,7 +1,0 @@
-D:\Working\github\davideweaver\loggr-dotnet\driver\bin\Debug\driver.exe.config
-D:\Working\github\davideweaver\loggr-dotnet\driver\bin\Debug\driver.exe
-D:\Working\github\davideweaver\loggr-dotnet\driver\bin\Debug\driver.pdb
-D:\Working\github\davideweaver\loggr-dotnet\driver\bin\Debug\loggr-dotnet.dll
-D:\Working\github\davideweaver\loggr-dotnet\driver\bin\Debug\loggr-dotnet.pdb
-D:\Working\github\davideweaver\loggr-dotnet\driver\obj\x86\Debug\driver.exe
-D:\Working\github\davideweaver\loggr-dotnet\driver\obj\x86\Debug\driver.pdb
